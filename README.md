@@ -30,9 +30,43 @@ To run the container through a VPN using Gluetun:
    docker-compose -f docker-compose-vpn.yml up -d
    ```
 
-   This will run both Gluetun (VPN client) and the Fedora VNC container with all traffic routed through the VPN.
+    This will run both Gluetun (VPN client) and the Fedora VNC container with all traffic routed through the VPN.
 
-4. Access via VNC on host: `5901` (gluetun handles the port forwarding)
+   4. Access via VNC on host: `5901` (gluetun handles the port forwarding)
+
+## Temporarily Disable VPN
+
+For faster package installations and system updates, you can temporarily disable the VPN without killing the containers:
+
+```bash
+# Turn off VPN (direct connection)
+./stop-vpn.sh
+
+# Do your updates/installs (much faster without VPN!)
+docker exec fedora-vnc /root/scripts/install-opencode.sh
+
+# Turn VPN back on
+./start-vpn.sh
+
+# Or toggle between on/off
+./toggle-vpn.sh
+```
+
+These scripts use the HTTP Control Server API:
+- Stop: `curl -X PUT -d '{"status":"stopped"}' http://localhost:8000/v1/vpn/status`
+- Start: `curl -X PUT -d '{"status":"running"}' http://localhost:8000/v1/vpn/status`
+
+### Exposed Ports
+
+When running with VPN, the following ports are exposed on the gluetun container:
+
+- `5901` - VNC desktop access
+- `8000` - HTTP Control Server API:
+  - `GET /v1/vpn/status` - Get VPN status
+  - `PUT /v1/vpn/status` - Start/stop VPN
+  - `GET /v1/publicip/ip` - Get current VPN IP
+  - See [Gluetun Control Server Docs](https://github.com/qdm12/gluetun-wiki/blob/main/setup/advanced/control-server.md) for more endpoints
+- `8894` - HTTP Proxy (maps to container port 8888)
 
 ## Installation Scripts
 

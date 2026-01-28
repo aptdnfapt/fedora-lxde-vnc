@@ -21,6 +21,8 @@ services:
       # - SERVER_CITIES=
     ports:
       - 5901:5901/tcp  # VNC port for fedora-vnc
+      - 8000:8000/tcp  # HTTP control server
+      - 8894:8888/tcp  # HTTP proxy (host:container)
     restart: unless-stopped
 
   fedora-vnc:
