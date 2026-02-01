@@ -1,8 +1,14 @@
-ervices:
+services:
   fedora-vnc:
     build: .
     ports:
       - "5901:5901"
+    volumes:
+      - vnc-data:/root
     environment:
       - RESOLUTION=1280x720
+      - VNC_PASSWORD=${VNC_PASSWORD:-vncpass}
     restart: unless-stopped
+
+volumes:
+  vnc-data:
